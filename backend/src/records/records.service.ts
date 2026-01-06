@@ -15,7 +15,10 @@ export class RecordsService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    await this.processPdf();
+    const count = await this.recordsRepository.count();
+    if (count === 0) {
+      await this.processPdf();
+    }
   }
 
   async processPdf() {
@@ -23,7 +26,6 @@ export class RecordsService implements OnModuleInit {
       const pdfPath = path.join(process.cwd(), '../data/data.pdf');
       
       if (!fs.existsSync(pdfPath)) {
-        console.error('PDF no encontrado en:', pdfPath);
         return;
       }
 
@@ -33,53 +35,39 @@ export class RecordsService implements OnModuleInit {
       const data = await pdfLib(dataBuffer);
       const lines = data.text.split('\n');
       
-      let count = 0;
+      let processedCount = 0;
 
       for (const line of lines) {
         if (line.includes('INV-')) {
           const success = await this.parseAndSaveLine(line);
-          if (success) count++;
+          if (success) processedCount++;
         }
       }
-      console.log(`✅ Carga de datos completada exitosamente. Se procesaron ${count} registros.`);
     } catch (error) {
-      console.error('Error procesando PDF:', error);
+      console.error(error);
     }
   }
 
   private async parseAndSaveLine(line: string): Promise<boolean> {
     try {
       const cleanLine = line.trim();
-
       const regex = /(INV-\d{4}-\d{3})(\d{2}-\d{2}-\d{4})(.+?)(\$[\d\.]+)(activo|cancelado|pendiente)(.*)/i;
       const match = cleanLine.match(regex);
 
       if (!match) return false;
 
-      const sourceId = match[1];
-      const dateStr = match[2]; 
-      const category = match[3];
-      const amountStr = match[4];
-      const status = match[5];
-      const description = match[6];
-
-      const amount = parseFloat(amountStr.replace('$', '').replace(/\./g, ''));
-      
-      const [day, month, year] = dateStr.split('-');
+      const [day, month, year] = match[2].split('-');
       const date = new Date(`${year}-${month}-${day}`);
 
       const record = this.recordsRepository.create({
-        sourceId,
-        date,
-        category,
-        amount,
-        status: status.toLowerCase(),
-        description,
+        date: date.toISOString().split('T')[0],
+        category: match[3].trim(),
+        amount: parseFloat(match[4].replace('$', '').replace(/\./g, '')),
+        description: match[6].trim() || 'Sin descripción',
       });
 
       await this.recordsRepository.save(record);
       return true;
-
     } catch (e) {
       return false;
     }

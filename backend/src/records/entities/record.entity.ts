@@ -1,28 +1,19 @@
-import { Entity, Column, PrimaryColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('records')
+@Entity({ name: 'financial_data' })
 export class Record {
-  @PrimaryColumn()
-  sourceId: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-  @Column({ type: 'date' })
-  date: Date;
+  @Column()
+  date: string;
+
+  @Column('decimal', { precision: 10, scale: 2 })
+  amount: number;
 
   @Column()
   category: string;
 
-  @Column('decimal', { precision: 12, scale: 2 })
-  amount: number;
-
   @Column()
-  status: string;
-
-  @Column({ type: 'text', nullable: true })
   description: string;
-
-  @CreateDateColumn()
-  created_at: Date;
-
-  @UpdateDateColumn()
-  updated_at: Date;
 }

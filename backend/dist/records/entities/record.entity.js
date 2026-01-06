@@ -12,49 +12,34 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Record = void 0;
 const typeorm_1 = require("typeorm");
 let Record = class Record {
-    sourceId;
+    id;
     date;
-    category;
     amount;
-    status;
+    category;
     description;
-    created_at;
-    updated_at;
 };
 exports.Record = Record;
 __decorate([
-    (0, typeorm_1.PrimaryColumn)(),
-    __metadata("design:type", String)
-], Record.prototype, "sourceId", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ type: 'date' }),
-    __metadata("design:type", Date)
-], Record.prototype, "date", void 0);
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
+    __metadata("design:type", Number)
+], Record.prototype, "id", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], Record.prototype, "category", void 0);
+], Record.prototype, "date", void 0);
 __decorate([
-    (0, typeorm_1.Column)('decimal', { precision: 12, scale: 2 }),
+    (0, typeorm_1.Column)('decimal', { precision: 10, scale: 2 }),
     __metadata("design:type", Number)
 ], Record.prototype, "amount", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], Record.prototype, "status", void 0);
+], Record.prototype, "category", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'text', nullable: true }),
+    (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Record.prototype, "description", void 0);
-__decorate([
-    (0, typeorm_1.CreateDateColumn)(),
-    __metadata("design:type", Date)
-], Record.prototype, "created_at", void 0);
-__decorate([
-    (0, typeorm_1.UpdateDateColumn)(),
-    __metadata("design:type", Date)
-], Record.prototype, "updated_at", void 0);
 exports.Record = Record = __decorate([
-    (0, typeorm_1.Entity)('records')
+    (0, typeorm_1.Entity)({ name: 'financial_data' })
 ], Record);
 //# sourceMappingURL=record.entity.js.map

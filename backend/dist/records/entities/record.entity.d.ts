@@ -1,10 +1,7 @@
 export declare class Record {
-    sourceId: string;
-    date: Date;
-    category: string;
+    id: number;
+    date: string;
     amount: number;
-    status: string;
+    category: string;
     description: string;
-    created_at: Date;
-    updated_at: Date;
 }
