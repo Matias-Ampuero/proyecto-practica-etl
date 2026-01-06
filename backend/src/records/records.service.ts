@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Record } from './entities/record.entity';
 import * as path from 'path';
-import * as pdf from 'pdf-parse';
 import * as fs from 'fs';
+import pdf = require('pdf-parse');
 
 @Injectable()
 export class RecordsService implements OnModuleInit {
@@ -26,19 +26,24 @@ export class RecordsService implements OnModuleInit {
     const data = await pdf(dataBuffer);
     
     const lines = data.text.split('\n');
+    
     for (const line of lines) {
-      const match = line.match(/(INV-\d{4}-\d{3})\s+(\d{2}\/\d{2}\/\d{4})\s+([\w\s]+)\s+\$(\d+\.\d{2})/);
+      const cleanLine = line.replace(/"/g, '').trim();
+      
+      const match = cleanLine.match(/(INV-2025-\d{3})\s*,?\s*(\d{2}-\d{2}-\d{4})\s*,?\s*([a-zA-ZáéíóúÁÉÍÓÚ\s]+)\s*,?\s*\$([\d\.]+)/);
+      
       if (match) {
         const [_, sourceId, dateStr, category, amountStr] = match;
-        const [day, month, year] = dateStr.split('/');
+        
+        const [day, month, year] = dateStr.split('-');
         
         const record = this.recordsRepository.create({
-          sourceId: sourceId,
+          sourceId: sourceId.trim(),
           date: `${year}-${month}-${day}`,
           category: category.trim(),
-          amount: parseFloat(amountStr),
+          amount: parseFloat(amountStr.replace(/\./g, '')),
           status: 'activo',
-          description: `Carga automática desde ${sourceId}`
+          description: `Carga automatica ${sourceId}`
         });
         
         await this.recordsRepository.upsert(record, ['sourceId']);

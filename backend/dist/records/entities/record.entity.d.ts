@@ -1,7 +1,9 @@
 export declare class Record {
     id: number;
+    sourceId: string;
     date: string;
-    amount: number;
     category: string;
+    amount: number;
+    status: string;
     description: string;
 }

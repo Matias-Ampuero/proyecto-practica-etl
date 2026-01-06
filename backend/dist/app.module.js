@@ -27,7 +27,7 @@ exports.AppModule = AppModule = __decorate([
                 password: '',
                 database: 'practica_db',
                 autoLoadEntities: true,
-                synchronize: false,
+                synchronize: true,
             }),
             records_module_1.RecordsModule,
             auth_module_1.AuthModule,

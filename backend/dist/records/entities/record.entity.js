@@ -13,9 +13,11 @@ exports.Record = void 0;
 const typeorm_1 = require("typeorm");
 let Record = class Record {
     id;
+    sourceId;
     date;
-    amount;
     category;
+    amount;
+    status;
     description;
 };
 exports.Record = Record;
@@ -24,22 +26,30 @@ __decorate([
     __metadata("design:type", Number)
 ], Record.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ type: 'varchar', unique: true }),
+    __metadata("design:type", String)
+], Record.prototype, "sourceId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'date' }),
     __metadata("design:type", String)
 ], Record.prototype, "date", void 0);
 __decorate([
-    (0, typeorm_1.Column)('decimal', { precision: 10, scale: 2 }),
-    __metadata("design:type", Number)
-], Record.prototype, "amount", void 0);
-__decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ type: 'varchar' }),
     __metadata("design:type", String)
 ], Record.prototype, "category", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ type: 'decimal', precision: 10, scale: 2 }),
+    __metadata("design:type", Number)
+], Record.prototype, "amount", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'varchar', default: 'activo' }),
+    __metadata("design:type", String)
+], Record.prototype, "status", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'text', nullable: true }),
     __metadata("design:type", String)
 ], Record.prototype, "description", void 0);
 exports.Record = Record = __decorate([
-    (0, typeorm_1.Entity)({ name: 'financial_data' })
+    (0, typeorm_1.Entity)({ name: 'records' })
 ], Record);
 //# sourceMappingURL=record.entity.js.map

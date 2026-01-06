@@ -5,21 +5,21 @@ export class Record {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', unique: true })
   sourceId: string;
 
   @Column({ type: 'date' })
   date: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   category: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   amount: number;
 
-  @Column({ default: 'activo' })
+  @Column({ type: 'varchar', default: 'activo' })
   status: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'text', nullable: true })
   description: string;
 }

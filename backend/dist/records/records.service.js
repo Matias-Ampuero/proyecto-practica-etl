@@ -50,8 +50,9 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const record_entity_1 = require("./entities/record.entity");
-const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
+const fs = __importStar(require("fs"));
+const pdf = require("pdf-parse");
 let RecordsService = class RecordsService {
     recordsRepository;
     constructor(recordsRepository) {
@@ -64,64 +65,40 @@ let RecordsService = class RecordsService {
         }
     }
     async processPdf() {
-        try {
-            const pdfPath = path.join(process.cwd(), '../data/data.pdf');
-            if (!fs.existsSync(pdfPath)) {
-                return;
+        const pdfPath = path.join(process.cwd(), '../data/data.pdf');
+        const dataBuffer = fs.readFileSync(pdfPath);
+        const data = await pdf(dataBuffer);
+        const lines = data.text.split('\n');
+        for (const line of lines) {
+            const cleanLine = line.replace(/"/g, '').trim();
+            const match = cleanLine.match(/(INV-2025-\d{3})\s*,?\s*(\d{2}-\d{2}-\d{4})\s*,?\s*([a-zA-ZáéíóúÁÉÍÓÚ\s]+)\s*,?\s*\$([\d\.]+)/);
+            if (match) {
+                const [_, sourceId, dateStr, category, amountStr] = match;
+                const [day, month, year] = dateStr.split('-');
+                const record = this.recordsRepository.create({
+                    sourceId: sourceId.trim(),
+                    date: `${year}-${month}-${day}`,
+                    category: category.trim(),
+                    amount: parseFloat(amountStr.replace(/\./g, '')),
+                    status: 'activo',
+                    description: `Carga automatica ${sourceId}`
+                });
+                await this.recordsRepository.upsert(record, ['sourceId']);
             }
-            const pdfLib = require('pdf-parse');
-            const dataBuffer = fs.readFileSync(pdfPath);
-            const data = await pdfLib(dataBuffer);
-            const lines = data.text.split('\n');
-            let processedCount = 0;
-            for (const line of lines) {
-                if (line.includes('INV-')) {
-                    const success = await this.parseAndSaveLine(line);
-                    if (success)
-                        processedCount++;
-                }
-            }
-        }
-        catch (error) {
-            console.error(error);
-        }
-    }
-    async parseAndSaveLine(line) {
-        try {
-            const cleanLine = line.trim();
-            const regex = /(INV-\d{4}-\d{3})(\d{2}-\d{2}-\d{4})(.+?)(\$[\d\.]+)(activo|cancelado|pendiente)(.*)/i;
-            const match = cleanLine.match(regex);
-            if (!match)
-                return false;
-            const [day, month, year] = match[2].split('-');
-            const date = new Date(`${year}-${month}-${day}`);
-            const record = this.recordsRepository.create({
-                date: date.toISOString().split('T')[0],
-                category: match[3].trim(),
-                amount: parseFloat(match[4].replace('$', '').replace(/\./g, '')),
-                description: match[6].trim() || 'Sin descripción',
-            });
-            await this.recordsRepository.save(record);
-            return true;
-        }
-        catch (e) {
-            return false;
         }
     }
     findAll() {
         return this.recordsRepository.find();
     }
-    async create(createRecordDto) {
-        const newRecord = this.recordsRepository.create(createRecordDto);
-        return await this.recordsRepository.save(newRecord);
+    create(data) {
+        return this.recordsRepository.save(data);
     }
-    async update(id, updateRecordDto) {
-        await this.recordsRepository.update(id, updateRecordDto);
+    async update(id, data) {
+        await this.recordsRepository.update(id, data);
         return this.recordsRepository.findOneBy({ id });
     }
-    async remove(id) {
-        await this.recordsRepository.delete(id);
-        return { deleted: true };
+    remove(id) {
+        return this.recordsRepository.delete(id);
     }
 };
 exports.RecordsService = RecordsService;

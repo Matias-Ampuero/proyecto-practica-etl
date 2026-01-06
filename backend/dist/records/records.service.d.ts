@@ -6,11 +6,8 @@ export declare class RecordsService implements OnModuleInit {
     constructor(recordsRepository: Repository<Record>);
     onModuleInit(): Promise<void>;
     processPdf(): Promise<void>;
-    private parseAndSaveLine;
     findAll(): Promise<Record[]>;
-    create(createRecordDto: any): Promise<Record[]>;
-    update(id: number, updateRecordDto: any): Promise<Record | null>;
-    remove(id: number): Promise<{
-        deleted: boolean;
-    }>;
+    create(data: Partial<Record>): Promise<Partial<Record> & Record>;
+    update(id: number, data: Partial<Record>): Promise<Record | null>;
+    remove(id: number): Promise<import("typeorm").DeleteResult>;
 }
