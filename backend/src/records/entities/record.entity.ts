@@ -1,19 +1,25 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity({ name: 'financial_data' })
+@Entity({ name: 'records' })
 export class Record {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  date: string;
+  @Column({ unique: true })
+  sourceId: string;
 
-  @Column('decimal', { precision: 10, scale: 2 })
-  amount: number;
+  @Column({ type: 'date' })
+  date: string;
 
   @Column()
   category: string;
 
-  @Column()
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  amount: number;
+
+  @Column({ default: 'activo' })
+  status: string;
+
+  @Column({ nullable: true })
   description: string;
 }
