@@ -15,7 +15,7 @@ import { AuthModule } from './auth/auth.module';
       password: '',
       database: 'practica_db',
       autoLoadEntities: true,
-      synchronize: false,
+      synchronize: true,
     }),
     RecordsModule,
     AuthModule,
