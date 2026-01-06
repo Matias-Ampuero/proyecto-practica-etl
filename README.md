@@ -10,7 +10,7 @@ Proyecto integral que automatiza la ingesta de datos desde archivos PDF hacia un
 * Archivo fuente data.pdf ubicado en la carpeta /data
 
 ### 2. Base de Datos
-Acceda a su terminal de MySQL o herramienta de gestión y ejecute el siguiente comando:
+Acceda a su terminal de MySQL o herramienta de gestión y ejecute el siguiente comando para crear el esquema inicial:
 
 CREATE DATABASE practica_db;
 
@@ -24,15 +24,27 @@ CREATE DATABASE practica_db;
 2. npm install
 3. npm run dev
 
+## 📋 Estructura de Datos y Normalización
+El sistema cumple con la estructura requerida para la tabla `records`:
+* sourceId: Identificador único extraído del PDF (usado para upsert/idempotencia).
+* date: Normalizado a formato YYYY-MM-DD.
+* category: Mapeo de categorías estandarizadas.
+* amount: Conversión a decimal (remoción de símbolos y separadores).
+* status: Normalizado a valores estándar (activo/pendiente/completado).
+
+## 🔄 Flujo ETL Implementado
+1. [Extract]: Lectura de data.pdf mediante pdf-parse.
+2. [Normalize]: Procesamiento mediante Regex para limpieza de strings, fechas y montos.
+3. [Load]: Ingesta automática en MySQL con lógica de upsert por sourceId para evitar duplicidad.
+
 ## 🔐 Credenciales de Acceso (Prueba)
 * Usuario: matias@test.com
 * Contraseña: 123456
 
-## 🛠️ Funcionalidades del Proyecto
-* Motor ETL: Procesamiento automático de documentos PDF mediante Expresiones Regulares (Regex).
-* Gestión de Registros (CRUD): Interfaz completa para Visualizar, Crear, Editar y Eliminar registros.
-* Seguridad: Rutas protegidas mediante autenticación JWT.
-* Dashboard Moderno: Diseño responsivo con barra lateral y barra de herramientas utilizando Vuetify.
+## 🛠️ Tecnologías
+* Backend: NestJS, TypeORM, TypeScript.
+* Frontend: Vue 3, Vuetify 3, Pinia, Axios.
+* DB: MySQL 8.0.
 
 ---
 Autor: Matias Ampuero
