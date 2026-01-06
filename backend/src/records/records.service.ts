@@ -76,4 +76,18 @@ export class RecordsService implements OnModuleInit {
   findAll() {
     return this.recordsRepository.find();
   }
+  async create(createRecordDto: any) {
+    const newRecord = this.recordsRepository.create(createRecordDto);
+    return await this.recordsRepository.save(newRecord);
+  }
+
+  async update(id: number, updateRecordDto: any) {
+    await this.recordsRepository.update(id, updateRecordDto);
+    return this.recordsRepository.findOneBy({ id });
+  }
+
+  async remove(id: number) {
+    await this.recordsRepository.delete(id);
+    return { deleted: true };
+  }
 }

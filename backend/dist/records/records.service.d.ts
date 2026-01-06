@@ -8,4 +8,9 @@ export declare class RecordsService implements OnModuleInit {
     processPdf(): Promise<void>;
     private parseAndSaveLine;
     findAll(): Promise<Record[]>;
+    create(createRecordDto: any): Promise<Record[]>;
+    update(id: number, updateRecordDto: any): Promise<Record | null>;
+    remove(id: number): Promise<{
+        deleted: boolean;
+    }>;
 }

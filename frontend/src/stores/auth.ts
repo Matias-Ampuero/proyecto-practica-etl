@@ -1,27 +1,32 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import api from '../services/api'
+import { ref, computed } from 'vue'
 import router from '../router'
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref(localStorage.getItem('token') || '')
+  const userEmail = ref(localStorage.getItem('userEmail') || '')
 
-  async function login(email: string, password: string) {
-    try {
-      const response = await api.post('/auth/login', { email, password })
-      token.value = response.data.accessToken
+  const isAuthenticated = computed(() => !!token.value)
+
+  async function login(email: string, pass: string) {
+    if (email === 'matias@test.com' && pass === '123456') {
+      token.value = 'fake-jwt-token'
+      userEmail.value = email
       localStorage.setItem('token', token.value)
+      localStorage.setItem('userEmail', email)
       router.push('/records')
-    } catch (error) {
-      throw error
+    } else {
+      throw new Error('Credenciales incorrectas')
     }
   }
 
   function logout() {
     token.value = ''
+    userEmail.value = ''
     localStorage.removeItem('token')
+    localStorage.removeItem('userEmail')
     router.push('/login')
   }
 
-  return { token, login, logout }
+  return { token, userEmail, isAuthenticated, login, logout }
 })

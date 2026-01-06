@@ -111,6 +111,18 @@ let RecordsService = class RecordsService {
     findAll() {
         return this.recordsRepository.find();
     }
+    async create(createRecordDto) {
+        const newRecord = this.recordsRepository.create(createRecordDto);
+        return await this.recordsRepository.save(newRecord);
+    }
+    async update(id, updateRecordDto) {
+        await this.recordsRepository.update(id, updateRecordDto);
+        return this.recordsRepository.findOneBy({ id });
+    }
+    async remove(id) {
+        await this.recordsRepository.delete(id);
+        return { deleted: true };
+    }
 };
 exports.RecordsService = RecordsService;
 exports.RecordsService = RecordsService = __decorate([
