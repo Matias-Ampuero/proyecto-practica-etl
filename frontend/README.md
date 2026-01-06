@@ -1,61 +1,48 @@
-# Frontend - Vue 3 + Vuetify 3
+# frontend
 
-## 📋 Objetivo
+This template should help get you started developing with Vue 3 in Vite.
 
-Crear una aplicación web en Vue 3 con Vuetify 3 que:
-1. Permita login con JWT
-2. Muestre una tabla de records
-3. Permita crear/editar records
-4. Tenga una interfaz con sidebar, toolbar y main section
+## Recommended IDE Setup
 
-## 🚀 Setup Inicial
+[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
 
-### 1. Crear Proyecto Vue 3
-### 2. Instalar Vuetify 3
+## Recommended Browser Setup
 
-Sigue la guía oficial: https://vuetifyjs.com/en/getting-started/installation/
+- Chromium-based browsers (Chrome, Edge, Brave, etc.):
+  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
+  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
+- Firefox:
+  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
+  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
 
-## ✅ Pantallas a Implementar
+## Type Support for `.vue` Imports in TS
 
-### 1. Login (`/login`)
+TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
 
-- Formulario con campos:
-  - Email (text field)
-  - Password (password field)
-- Botón "Iniciar Sesión"
-- Al hacer login:
-  - Guardar token en localStorage
-  - Redirigir a `/records`
-- Mostrar errores si las credenciales son inválidas
+## Customize configuration
 
-### 2. Records (`/records`)
+See [Vite Configuration Reference](https://vite.dev/config/).
 
-- **Tabla Vuetify**
+## Project Setup
 
-### 3. Layout Base
+```sh
+npm install
+```
 
-- AppBar con:
-  - Título
-  - Email del usuario logueado
-  - Botón "Cerrar Sesión"
-- Navigation drawer
+### Compile and Hot-Reload for Development
 
-## 🔐 Autenticación
+```sh
+npm run dev
+```
 
-### Store de Auth (`stores/auth.ts`)
+### Type-Check, Compile and Minify for Production
 
+```sh
+npm run build
+```
 
-## 🌐 Cliente API
+### Lint with [ESLint](https://eslint.org/)
 
-Debes usar Axios. Crea `src/services/api.ts` con:
-- Configuración de baseURL
-- Interceptor para agregar token JWT en headers
-- Interceptor para manejar errores 401 (redirigir a login)
-
-## 📱 Responsive
-
-- Usa el sistema de grid de Vuetify (`v-row`, `v-col`)
-- La tabla debe ser responsive (scroll horizontal en móviles o cards)
-
-**¡Sigue la guía de instalación de Vuetify 3 y empieza con el login!**
-
+```sh
+npm run lint
+```
