@@ -2,10 +2,9 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Record } from './entities/record.entity';
-import * as fs from 'fs';
 import * as path from 'path';
-
-declare const require: any;
+import * as pdf from 'pdf-parse';
+import * as fs from 'fs';
 
 @Injectable()
 export class RecordsService implements OnModuleInit {
@@ -22,72 +21,45 @@ export class RecordsService implements OnModuleInit {
   }
 
   async processPdf() {
-    try {
-      const pdfPath = path.join(process.cwd(), '../data/data.pdf');
-      
-      if (!fs.existsSync(pdfPath)) {
-        return;
+    const pdfPath = path.join(process.cwd(), '../data/data.pdf');
+    const dataBuffer = fs.readFileSync(pdfPath);
+    const data = await pdf(dataBuffer);
+    
+    const lines = data.text.split('\n');
+    for (const line of lines) {
+      const match = line.match(/(INV-\d{4}-\d{3})\s+(\d{2}\/\d{2}\/\d{4})\s+([\w\s]+)\s+\$(\d+\.\d{2})/);
+      if (match) {
+        const [_, sourceId, dateStr, category, amountStr] = match;
+        const [day, month, year] = dateStr.split('/');
+        
+        const record = this.recordsRepository.create({
+          sourceId: sourceId,
+          date: `${year}-${month}-${day}`,
+          category: category.trim(),
+          amount: parseFloat(amountStr),
+          status: 'activo',
+          description: `Carga automática desde ${sourceId}`
+        });
+        
+        await this.recordsRepository.upsert(record, ['sourceId']);
       }
-
-      const pdfLib = require('pdf-parse');
-      const dataBuffer = fs.readFileSync(pdfPath);
-      
-      const data = await pdfLib(dataBuffer);
-      const lines = data.text.split('\n');
-      
-      let processedCount = 0;
-
-      for (const line of lines) {
-        if (line.includes('INV-')) {
-          const success = await this.parseAndSaveLine(line);
-          if (success) processedCount++;
-        }
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  private async parseAndSaveLine(line: string): Promise<boolean> {
-    try {
-      const cleanLine = line.trim();
-      const regex = /(INV-\d{4}-\d{3})(\d{2}-\d{2}-\d{4})(.+?)(\$[\d\.]+)(activo|cancelado|pendiente)(.*)/i;
-      const match = cleanLine.match(regex);
-
-      if (!match) return false;
-
-      const [day, month, year] = match[2].split('-');
-      const date = new Date(`${year}-${month}-${day}`);
-
-      const record = this.recordsRepository.create({
-        date: date.toISOString().split('T')[0],
-        category: match[3].trim(),
-        amount: parseFloat(match[4].replace('$', '').replace(/\./g, '')),
-        description: match[6].trim() || 'Sin descripción',
-      });
-
-      await this.recordsRepository.save(record);
-      return true;
-    } catch (e) {
-      return false;
     }
   }
 
   findAll() {
     return this.recordsRepository.find();
   }
-  async create(createRecordDto: any) {
-    const newRecord = this.recordsRepository.create(createRecordDto);
-    return await this.recordsRepository.save(newRecord);
+
+  create(data: Partial<Record>) {
+    return this.recordsRepository.save(data);
   }
 
-  async update(id: number, updateRecordDto: any) {
-    await this.recordsRepository.update(id, updateRecordDto);
+  async update(id: number, data: Partial<Record>) {
+    await this.recordsRepository.update(id, data);
     return this.recordsRepository.findOneBy({ id });
   }
 
-  async remove(id: number) {
-    await this.recordsRepository.delete(id);
-    return { deleted: true };
+  remove(id: number) {
+    return this.recordsRepository.delete(id);
   }
 }
